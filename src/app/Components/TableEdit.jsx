@@ -5,7 +5,14 @@ import {
   createRow,
   useMaterialReactTable,
 } from "material-react-table";
-import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import {
   QueryClient,
   QueryClientProvider,
@@ -14,14 +21,33 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { fakeData, reason, usStates } from "./makeData";
-import EditIcon from "@mui/icons-material/Edit";
+//import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { v4 as uuidv4 } from "uuid";
 
+import * as React from "react";
+import dayjs from "dayjs";
+import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
+import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
 const Example = () => {
   const [validationErrors, setValidationErrors] = useState({});
+  const [editedUsers, setEditedUsers] = useState({});
   //console.log(setValidationErrors);
+
+  const showDate = () => {
+    return (
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DemoContainer components={["MobileDatePicker"]}>
+          <DemoItem>
+            <MobileDatePicker defaultValue={dayjs()} />
+          </DemoItem>
+        </DemoContainer>
+      </LocalizationProvider>
+    );
+  };
 
   const columns = useMemo(
     () => [
@@ -34,90 +60,121 @@ const Example = () => {
       {
         accessorKey: "date",
         header: "Fecha",
-        Cell: ({ value }) => {
-          const date = new Date();
-          return date instanceof Date && !isNaN(date)
-            ? date.toLocaleDateString()
-            : "Invalid date";
-        },
-        muiEditTextFieldProps: {
+        enableEditing: false,
+        Cell: () => showDate(),
+      },
+      {
+        accessorKey: "crm",
+        header: "CRM",
+        muiEditTextFieldProps: ({ cell, row }) => ({
+          type: "text",
           required: true,
-          error: !!validationErrors?.date,
-          helperText: validationErrors?.date
-            ? validationErrors.date.toString()
-            : "",
-        },
+          error: !!validationErrors?.[cell.id],
+          helperText: validationErrors?.[cell.id],
+          //store edited user in state to be saved later
+          onBlur: (event) => {
+            const validationError = !validateRequired(event.currentTarget.value)
+              ? "Required"
+              : undefined;
+            setValidationErrors({
+              ...validationErrors,
+              [cell.id]: validationError,
+            });
+            setEditedUsers({ ...editedUsers, [row.id]: row.original });
+          },
+        }),
       },
       {
         accessorKey: "firstName",
         header: "First Name",
-        muiEditTextFieldProps: {
+        muiEditTextFieldProps: ({ cell, row }) => ({
+          type: "text",
           required: true,
-          error: !!validationErrors?.firstName,
-          helperText: validationErrors?.firstName,
-          //eliminar cualquier error de validación anterior cuando el usuario se centra en la entrada
-          onFocus: () =>
+          error: !!validationErrors?.[cell.id],
+          helperText: validationErrors?.[cell.id],
+          //store edited user in state to be saved later
+          onBlur: (event) => {
+            const validationError = !validateRequired(event.currentTarget.value)
+              ? "Required"
+              : undefined;
             setValidationErrors({
               ...validationErrors,
-              firstName: undefined,
-            }),
-        },
+              [cell.id]: validationError,
+            });
+            setEditedUsers({ ...editedUsers, [row.id]: row.original });
+          },
+        }),
       },
       {
         accessorKey: "lastName",
         header: "Last Name",
-        muiEditTextFieldProps: {
+        muiEditTextFieldProps: ({ cell, row }) => ({
+          type: "text",
           required: true,
-          error: !!validationErrors?.lastName,
-          helperText: validationErrors?.lastName,
-          //eliminar cualquier error de validación anterior cuando el usuario se centra en la entrada
-          onFocus: () =>
+          error: !!validationErrors?.[cell.id],
+          helperText: validationErrors?.[cell.id],
+          //store edited user in state to be saved later
+          onBlur: (event) => {
+            const validationError = !validateRequired(event.currentTarget.value)
+              ? "Required"
+              : undefined;
             setValidationErrors({
               ...validationErrors,
-              lastName: undefined,
-            }),
-        },
+              [cell.id]: validationError,
+            });
+            setEditedUsers({ ...editedUsers, [row.id]: row.original });
+          },
+        }),
       },
       {
         accessorKey: "state",
         header: "Estado",
         editVariant: "select",
         editSelectOptions: usStates,
-        muiEditTextFieldProps: {
+        muiEditTextFieldProps: ({ row }) => ({
           select: true,
           error: !!validationErrors?.state,
           helperText: validationErrors?.state,
-        },
+          onChange: (event) =>
+            setEditedUsers({
+              ...editedUsers,
+              [row.id]: { ...row.original, state: event.target.value },
+            }),
+        }),
       },
       {
         accessorKey: "reason",
         header: "Motivo",
         editVariant: "select",
         editSelectOptions: reason,
-        muiEditTextFieldProps: {
+        muiEditTextFieldProps: ({ row }) => ({
           select: true,
           error: !!validationErrors?.state,
           helperText: validationErrors?.state,
-        },
+          onChange: (event) =>
+            setEditedUsers({
+              ...editedUsers,
+              [row.id]: { ...row.original, state: event.target.value },
+            }),
+        }),
       },
       {
         accessorKey: "commission",
         header: "Comision",
         enableEditing: false,
-        muiEditTextFieldProps: {
-          required: true,
-          error: !!validationErrors?.commission,
-          helperText: validationErrors?.commission,
-          //eliminar cualquier error de validación anterior cuando el usuario se centra en la entrada
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              commission: undefined,
+        muiEditTextFieldProps: ({ row }) => ({
+          select: true,
+          error: !!validationErrors?.state,
+          helperText: validationErrors?.state,
+          onChange: (event) =>
+            setEditedUsers({
+              ...editedUsers,
+              [row.id]: { ...row.original, state: event.target.value },
             }),
-        },
+        }),
       },
     ],
-    [validationErrors]
+    [editedUsers, validationErrors]
   );
 
   //call CREATE hook
@@ -131,7 +188,7 @@ const Example = () => {
     isLoading: isLoadingUsers,
   } = useGetUsers();
   //call UPDATE hook
-  const { mutateAsync: updateUser, isPending: isUpdatingUser } =
+  const { mutateAsync: updateUser, isPending: isUpdatingUsers } =
     useUpdateUser();
   //call DELETE hook
   const { mutateAsync: deleteUser, isPending: isDeletingUser } =
@@ -150,15 +207,10 @@ const Example = () => {
   };
 
   //UPDATE action
-  const handleSaveUser = async ({ values, table }) => {
-    const newValidationErrors = validateUser(values);
-    if (Object.values(newValidationErrors).some((error) => error)) {
-      setValidationErrors(newValidationErrors);
-      return;
-    }
-    setValidationErrors({});
-    await updateUser(values);
-    table.setEditingRow(null); //exit editing mode
+  const handleSaveUsers = async () => {
+    if (Object.values(validationErrors).some((error) => !!error)) return;
+    await updateUsers(Object.values(editedUsers));
+    setEditedUsers({});
   };
 
   //DELETE action
@@ -172,8 +224,12 @@ const Example = () => {
     columns,
     data: fetchedUsers,
     createDisplayMode: "row", // ('modal', and 'custom' también están disponibles)
-    editDisplayMode: "row", // ('modal', 'cell', 'table', and 'custom' también están disponibles)
+    editDisplayMode: "cell", // ('modal', 'cell', 'table', and 'custom' también están disponibles)
+    enableCellActions: true,
+    enableClickToCopy: "context-menu",
+    enableColumnPinning: true,
     enableEditing: true,
+    enableRowActions: true,
     getRowId: (row) => row.id,
 
     muiToolbarAlertBannerProps: isLoadingUsersError
@@ -189,20 +245,31 @@ const Example = () => {
     },
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateUser,
-    onEditingRowCancel: () => setValidationErrors({}),
-    onEditingRowSave: handleSaveUser,
-    renderRowActions: ({ row, table }) => (
+    renderRowActions: ({ row }) => (
       <Box sx={{ display: "flex", gap: "1rem" }}>
-        <Tooltip title="Edit">
-          <IconButton onClick={() => table.setEditingRow(row)}>
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
         <Tooltip title="Delete">
           <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
+      </Box>
+    ),
+    renderBottomToolbarCustomActions: () => (
+      <Box sx={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+        <Button
+          color="success"
+          variant="contained"
+          onClick={handleSaveUsers}
+          disabled={
+            Object.keys(editedUsers).length === 0 ||
+            Object.values(validationErrors).some((error) => !!error)
+          }
+        >
+          {isUpdatingUsers ? <CircularProgress size={25} /> : "Save"}
+        </Button>
+        {Object.values(validationErrors).some((error) => !!error) && (
+          <Typography color="error">Fix errors before submitting</Typography>
+        )}
       </Box>
     ),
     renderTopToolbarCustomActions: ({ table }) => (
@@ -214,7 +281,8 @@ const Example = () => {
           table.setCreatingRow(
             createRow(table, {
               id: uuidv4().substring(0, 6),
-              date: new Date().toLocaleDateString(),
+              //date: new Date().toLocaleDateString(),
+              date: showDate(),
               firstName: "Daniel",
               lastName: "Revoredo",
               state: "Cancelado",
@@ -229,7 +297,7 @@ const Example = () => {
     ),
     state: {
       isLoading: isLoadingUsers,
-      isSaving: isCreatingUser || isUpdatingUser || isDeletingUser,
+      isSaving: isCreatingUser || isUpdatingUsers || isDeletingUser,
       showAlertBanner: isLoadingUsersError,
       showProgressBars: isFetchingUsers,
     },
@@ -244,11 +312,11 @@ function useCreateUser() {
   return useMutation({
     mutationFn: async (user) => {
       //enviar solicitud de actualización de API aquí
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
+      await new Promise((resolve) => setTimeout(resolve, 500)); //fake api call
       return Promise.resolve();
     },
     //actualización optimista del lado del cliente
-    b: (newUserInfo) => {
+    onMutate: (newUserInfo) => {
       queryClient.setQueryData(["users"], (prevUsers) => [
         ...prevUsers,
         { ...newUserInfo, id: uuidv4() },
@@ -264,7 +332,7 @@ function useGetUsers() {
     queryKey: ["users"],
     queryFn: async () => {
       //send api request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
+      await new Promise((resolve) => setTimeout(resolve, 500)); //fake api call
       return Promise.resolve(fakeData);
     },
     refetchOnWindowFocus: false,
@@ -277,15 +345,16 @@ function useUpdateUser() {
   return useMutation({
     mutationFn: async (user) => {
       //send api update request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
+      await new Promise((resolve) => setTimeout(resolve, 500)); //fake api call
       return Promise.resolve();
     },
     //client side optimistic update
-    onMutate: (newUserInfo) => {
+    onMutate: (newUsers) => {
       queryClient.setQueryData(["users"], (prevUsers) =>
-        prevUsers?.map((prevUser) =>
-          prevUser.id === newUserInfo.id ? newUserInfo : prevUser
-        )
+        prevUsers?.map((user) => {
+          const newUser = newUsers.find((u) => u.id === user.id);
+          return newUser ? newUser : user;
+        })
       );
     },
     // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
@@ -298,7 +367,7 @@ function useDeleteUser() {
   return useMutation({
     mutationFn: async (userId) => {
       //send api update request here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); //fake api call
+      await new Promise((resolve) => setTimeout(resolve, 500)); //fake api call
       return Promise.resolve();
     },
     //client side optimistic update
@@ -331,7 +400,7 @@ function validateUser(user) {
       ? "First Name is Required"
       : "",
     lastName: !validateRequired(user.lastName) ? "Last Name is Required" : "",
-    date: !validateRequired(user.date) ? "Date is Required" : "",
+    //date: !validateRequired(user.date) ? "Date is Required" : "",
     commission: !validateRequired(user.commission)
       ? "Commission is Required"
       : "",
