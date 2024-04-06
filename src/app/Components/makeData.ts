@@ -89,3 +89,10 @@ export type User = {
     'No contesta',
     'Otro asesor',
   ];
+
+  export const service = [
+    'Porta Chip',
+    'Porta Pack',
+    'Renovacion',
+    'Alta nueva',
+  ];

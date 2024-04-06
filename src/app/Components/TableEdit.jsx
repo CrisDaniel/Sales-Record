@@ -20,7 +20,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { fakeData, reason, usStates } from "./makeData";
+import { fakeData, reason, service, usStates } from "./makeData";
 //import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -31,6 +31,7 @@ import dayjs from "dayjs";
 import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { WidthFull } from "@mui/icons-material";
 
 const Example = () => {
   const [validationErrors, setValidationErrors] = useState({});
@@ -55,17 +56,24 @@ const Example = () => {
         accessorKey: "id",
         header: "Id",
         enableEditing: false,
-        size: 80,
+        size: 60,
+        enableSorting: false,
+        enableColumnActions: false,
+        //enableColumnFilter: false,
       },
       {
         accessorKey: "date",
         header: "Fecha",
         enableEditing: false,
+        size: 120,
         Cell: () => showDate(),
       },
       {
         accessorKey: "crm",
         header: "CRM",
+        size: 120,
+        enableSorting: false,
+        enableColumnActions: false,
         muiEditTextFieldProps: ({ cell, row }) => ({
           type: "text",
           required: true,
@@ -74,7 +82,7 @@ const Example = () => {
           //store edited user in state to be saved later
           onBlur: (event) => {
             const validationError = !validateRequired(event.currentTarget.value)
-              ? "Required"
+              ? "Requerido"
               : undefined;
             setValidationErrors({
               ...validationErrors,
@@ -85,38 +93,38 @@ const Example = () => {
         }),
       },
       {
-        accessorKey: "firstName",
-        header: "First Name",
-        muiEditTextFieldProps: ({ cell, row }) => ({
-          type: "text",
-          required: true,
-          error: !!validationErrors?.[cell.id],
-          helperText: validationErrors?.[cell.id],
-          //store edited user in state to be saved later
-          onBlur: (event) => {
-            const validationError = !validateRequired(event.currentTarget.value)
-              ? "Required"
-              : undefined;
-            setValidationErrors({
-              ...validationErrors,
-              [cell.id]: validationError,
-            });
-            setEditedUsers({ ...editedUsers, [row.id]: row.original });
-          },
+        accessorKey: "service",
+        header: "Servicio",
+        editVariant: "select",
+        editSelectOptions: service,
+        size: 120,
+        enableColumnActions: false,
+        muiEditTextFieldProps: ({ row }) => ({
+          select: true,
+          error: !!validationErrors?.state,
+          helperText: validationErrors?.state,
+          onChange: (event) =>
+            setEditedUsers({
+              ...editedUsers,
+              [row.id]: { ...row.original, state: event.target.value },
+            }),
         }),
       },
       {
-        accessorKey: "lastName",
-        header: "Last Name",
+        accessorKey: "numero",
+        header: "# Contacto",
+        size: 100,
+        enableSorting: false,
+        enableColumnActions: false,
         muiEditTextFieldProps: ({ cell, row }) => ({
-          type: "text",
+          type: "number",
           required: true,
           error: !!validationErrors?.[cell.id],
           helperText: validationErrors?.[cell.id],
           //store edited user in state to be saved later
           onBlur: (event) => {
             const validationError = !validateRequired(event.currentTarget.value)
-              ? "Required"
+              ? "Requerido"
               : undefined;
             setValidationErrors({
               ...validationErrors,
@@ -131,6 +139,8 @@ const Example = () => {
         header: "Estado",
         editVariant: "select",
         editSelectOptions: usStates,
+        size: 120,
+        enableColumnActions: false,
         muiEditTextFieldProps: ({ row }) => ({
           select: true,
           error: !!validationErrors?.state,
@@ -146,7 +156,9 @@ const Example = () => {
         accessorKey: "reason",
         header: "Motivo",
         editVariant: "select",
+        size: 120,
         editSelectOptions: reason,
+        enableColumnActions: false,
         muiEditTextFieldProps: ({ row }) => ({
           select: true,
           error: !!validationErrors?.state,
@@ -159,9 +171,34 @@ const Example = () => {
         }),
       },
       {
+        accessorKey: "subMotiv",
+        header: "Sub Motivo",
+        size: 120,
+        enableColumnActions: false,
+        muiEditTextFieldProps: ({ cell, row }) => ({
+          type: "text",
+          required: true,
+          error: !!validationErrors?.[cell.id],
+          helperText: validationErrors?.[cell.id],
+          //store edited user in state to be saved later
+          onBlur: (event) => {
+            const validationError = !validateRequired(event.currentTarget.value)
+              ? "Required"
+              : undefined;
+            setValidationErrors({
+              ...validationErrors,
+              [cell.id]: validationError,
+            });
+            setEditedUsers({ ...editedUsers, [row.id]: row.original });
+          },
+        }),
+      },
+      {
         accessorKey: "commission",
         header: "Comision",
         enableEditing: false,
+        size: 80,
+        enableColumnActions: false,
         muiEditTextFieldProps: ({ row }) => ({
           select: true,
           error: !!validationErrors?.state,
@@ -188,7 +225,7 @@ const Example = () => {
     isLoading: isLoadingUsers,
   } = useGetUsers();
   //call UPDATE hook
-  const { mutateAsync: updateUser, isPending: isUpdatingUsers } =
+  const { mutateAsync: updateUsers, isPending: isUpdatingUsers } =
     useUpdateUser();
   //call DELETE hook
   const { mutateAsync: deleteUser, isPending: isDeletingUser } =
@@ -215,7 +252,7 @@ const Example = () => {
 
   //DELETE action
   const openDeleteConfirmModal = (row) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
+    if (window.confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
       deleteUser(row.original.id);
     }
   };
@@ -230,6 +267,19 @@ const Example = () => {
     enableColumnPinning: true,
     enableEditing: true,
     enableRowActions: true,
+    enableFullScreenToggle: false, //Muestra un icono para pantalla completa
+    enablePagination: false, //Muestra la paginacion
+    //enableColumnResizing: true, //Permite cambiar el tamano de la columna
+    //enableTopToolbar: false, //Muestra la barra de herramientas Top-Bottom
+    //enableColumnVirtualization: false,
+    enableDensityToggle: false, //Muestra el icono de densidad
+    initialState: {density: "compact"}, //Establece la densidad
+    muiTableProps: {
+      sx: {
+        border: "5px solid red",
+        width: "100%",
+      }
+    },
     getRowId: (row) => row.id,
 
     muiToolbarAlertBannerProps: isLoadingUsersError
@@ -240,9 +290,15 @@ const Example = () => {
       : undefined,
     muiTableContainerProps: {
       sx: {
-        minHeight: "500px",
+        border: "5px solid blue",
       },
     },
+    //Determina el tamano de la tabla con maxHeight y minHeight
+    /* muiTableContainerProps: {
+      sx: {
+        maxHeight: "500px",
+      },
+    }, */
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateUser,
     renderRowActions: ({ row }) => (
@@ -265,7 +321,7 @@ const Example = () => {
             Object.values(validationErrors).some((error) => !!error)
           }
         >
-          {isUpdatingUsers ? <CircularProgress size={25} /> : "Save"}
+          {isUpdatingUsers ? <CircularProgress size={25} /> : "Saves"}
         </Button>
         {Object.values(validationErrors).some((error) => !!error) && (
           <Typography color="error">Fix errors before submitting</Typography>
@@ -280,10 +336,9 @@ const Example = () => {
           //La forma más sencilla de abrir el modo de creación de fila sin valores predeterminados o puede pasar un objeto de fila para establecer valores predeterminados con la función auxiliar `createRow`.
           table.setCreatingRow(
             createRow(table, {
-              id: uuidv4().substring(0, 6),
-              //date: new Date().toLocaleDateString(),
+              //id: uuidv4().substring(0, 6),
               date: showDate(),
-              firstName: "Daniel",
+              service: "Porta Chip",
               lastName: "Revoredo",
               state: "Cancelado",
               reason: "Delivery",
@@ -292,7 +347,7 @@ const Example = () => {
           );
         }}
       >
-        Create New User
+        Crear nueva venta
       </Button>
     ),
     state: {
@@ -303,7 +358,12 @@ const Example = () => {
     },
   });
 
-  return <MaterialReactTable table={table} />;
+  //return <MaterialReactTable table={table} />;
+  return (
+    <Box sx={{ width: '70%' }}>
+      <MaterialReactTable table={table} />
+    </Box>
+  );
 };
 
 //CREATE hook (post new user to api)
@@ -318,8 +378,8 @@ function useCreateUser() {
     //actualización optimista del lado del cliente
     onMutate: (newUserInfo) => {
       queryClient.setQueryData(["users"], (prevUsers) => [
+        { ...newUserInfo, id: uuidv4().substring(0, 6) }, //AL momento de guardar, este es el ID final que se guarda
         ...prevUsers,
-        { ...newUserInfo, id: uuidv4() },
       ]);
     },
     // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
@@ -396,11 +456,7 @@ const validateRequired = (value) => !!value.length;
 
 function validateUser(user) {
   return {
-    firstName: !validateRequired(user.firstName)
-      ? "First Name is Required"
-      : "",
-    lastName: !validateRequired(user.lastName) ? "Last Name is Required" : "",
-    //date: !validateRequired(user.date) ? "Date is Required" : "",
+    subMotiv: !validateRequired(user.subMotiv) ? "Sub Motivo is Required" : "",
     commission: !validateRequired(user.commission)
       ? "Commission is Required"
       : "",
