@@ -13,8 +13,9 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import Link from "next/link";
 
-const pages = ["Home", "Registros", "Blog"];
+const pages = ["home", "registros", "blog"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function ResponsiveAppBar() {
@@ -45,7 +46,6 @@ function ResponsiveAppBar() {
             variant="h6"
             noWrap
             component="a"
-            href="/"
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -116,20 +116,34 @@ function ResponsiveAppBar() {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "white", display: "block" }}
-              >
-                {page}
-              </Button>
+              <Link key={page} href={page == "home" ? "/" : `/${page}`} style={{textDecoration: "none"}}>
+                <Box>
+                  <Button
+                    key={page}
+                    onClick={handleCloseNavMenu}
+                    sx={{ my: 2, color: "white", display: "block" }}
+                  >
+                    {page}
+                  </Button>
+                </Box>
+              </Link>
             ))}
           </Box>
+          <Link href="/registros">
+            <Box>
+              <Button sx={{ color: "black", backgroundColor: "green" }}>
+                Point
+              </Button>
+            </Box>
+          </Link>
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="https://robohash.org/190.43.149.235.png" />
+                <Avatar
+                  alt="Remy Sharp"
+                  src="https://robohash.org/190.43.149.235.png"
+                />
               </IconButton>
             </Tooltip>
             <Menu

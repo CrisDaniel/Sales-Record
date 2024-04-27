@@ -12,6 +12,9 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  darken,
+  lighten,
+  useTheme,
 } from "@mui/material";
 import {
   QueryClient,
@@ -34,9 +37,16 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { WidthFull } from "@mui/icons-material";
 
 const Example = () => {
+  const theme = useTheme();
+
+  //light or dark green
+  const baseBackgroundColor =
+    theme.palette.mode === "dark"
+      ? "rgba(3, 44, 43, 1)"
+      : "#03797187"; //#222a6899
+
   const [validationErrors, setValidationErrors] = useState({});
   const [editedUsers, setEditedUsers] = useState({});
-  //console.log(setValidationErrors);
 
   const showDate = () => {
     return (
@@ -273,12 +283,23 @@ const Example = () => {
     //enableTopToolbar: false, //Muestra la barra de herramientas Top-Bottom
     //enableColumnVirtualization: false,
     enableDensityToggle: false, //Muestra el icono de densidad
-    initialState: {density: "compact"}, //Establece la densidad
+    initialState: { density: "compact" }, //Establece la densidad
+    muiTableBodyCellProps: {
+      sx: {
+        color: "white",
+      }
+    },
+    muiTableHeadCellProps: {
+      sx:{
+        color: "white",
+      }
+    },
     muiTableProps: {
       sx: {
         border: "5px solid red",
         width: "100%",
-      }
+        color: "white",
+      },
     },
     getRowId: (row) => row.id,
 
@@ -293,6 +314,33 @@ const Example = () => {
         border: "5px solid blue",
       },
     },
+
+    //TODO:
+    muiTableBodyProps: {
+      sx: (theme) => ({
+        '& tr:nth-of-type(odd):not([data-selected="true"]):not([data-pinned="true"]) > td':
+          {
+            backgroundColor: darken(baseBackgroundColor, 0.1),
+          },
+        '& tr:nth-of-type(odd):not([data-selected="true"]):not([data-pinned="true"]):hover > td':
+          {
+            backgroundColor: darken(baseBackgroundColor, 0.2),
+          },
+        '& tr:nth-of-type(even):not([data-selected="true"]):not([data-pinned="true"]) > td':
+          {
+            backgroundColor: lighten(baseBackgroundColor, 0.1),
+          },
+        '& tr:nth-of-type(even):not([data-selected="true"]):not([data-pinned="true"]):hover > td':
+          {
+            backgroundColor: darken(baseBackgroundColor, 0.2),
+          },
+      }),
+    },
+    mrtTheme: (theme) => ({
+      baseBackgroundColor: baseBackgroundColor,
+      draggingBorderColor: theme.palette.primary.main,
+    }),
+
     //Determina el tamano de la tabla con maxHeight y minHeight
     /* muiTableContainerProps: {
       sx: {
@@ -302,7 +350,7 @@ const Example = () => {
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateUser,
     renderRowActions: ({ row }) => (
-      <Box sx={{ display: "flex", gap: "1rem" }}>
+      <Box sx={{ display: "flex", gap: "1rem"}}>
         <Tooltip title="Delete">
           <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
             <DeleteIcon />
@@ -360,7 +408,8 @@ const Example = () => {
 
   //return <MaterialReactTable table={table} />;
   return (
-    <Box sx={{ width: '70%' }}>
+    /*sx={{ width: "75%" }}*/
+    <Box>
       <MaterialReactTable table={table} />
     </Box>
   );

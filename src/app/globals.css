@@ -1,4 +1,5 @@
 body {
-  background-color: #192229; /* Color de fondo oscuro */
-  color: white; /* Color de texto blanco para que sea legible en el fondo oscuro */
+  /* background-color: #192229; Color de fondo oscuro */
+  background: url("../../public/img/bg.jpg");
+  background-size: cover;
 }
