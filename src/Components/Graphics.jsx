@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { PieChart, pieArcLabelClasses  } from "@mui/x-charts/PieChart";
+import { usePathname } from "next/navigation";
 
 const data = [
     { id: 0, label: 'Group A', value: 400, },
@@ -17,7 +18,8 @@ const getArcLabel = (params) => {
 };
 
 const Graphics = () => {
-  return (
+  const pathName = usePathname();
+  return pathName == "/" ? (
     <div>
       <PieChart
         slotProps={{
@@ -54,7 +56,7 @@ const Graphics = () => {
           }}
       />
     </div>
-  );
+  ) : <></>;
 };
 
 export default Graphics;

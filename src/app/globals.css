@@ -1,5 +1,7 @@
 body {
   /* background-color: #192229; Color de fondo oscuro */
-  background: url("../../public/img/bg.jpg");
+  /* background: url("../../public/img/bg.jpg"); */
+  background: #121212;
   background-size: cover;
+  color: white;
 }

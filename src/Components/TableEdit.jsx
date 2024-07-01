@@ -35,6 +35,7 @@ import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { WidthFull } from "@mui/icons-material";
+import styled from "@emotion/styled";
 
 const Example = () => {
   const theme = useTheme();
@@ -43,7 +44,8 @@ const Example = () => {
   const baseBackgroundColor =
     theme.palette.mode === "dark"
       ? "rgba(3, 44, 43, 1)"
-      : "#03797187"; //#222a6899
+      : //: "#b5b2b2";
+        "#1e1e1e"; //#222a6899
 
   const [validationErrors, setValidationErrors] = useState({});
   const [editedUsers, setEditedUsers] = useState({});
@@ -53,7 +55,10 @@ const Example = () => {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DemoContainer components={["MobileDatePicker"]}>
           <DemoItem>
-            <MobileDatePicker defaultValue={dayjs()} />
+            <MobileDatePicker
+              defaultValue={dayjs()}
+              sx={{ background: "red", color: "white", fontWeight: "bold" }}
+            />
           </DemoItem>
         </DemoContainer>
       </LocalizationProvider>
@@ -73,10 +78,12 @@ const Example = () => {
       },
       {
         accessorKey: "date",
-        header: "Fecha",
+        header: "Fecha (d-m-y)",
         enableEditing: false,
         size: 120,
         Cell: () => showDate(),
+        enableSorting: false,
+        enableColumnActions: false,
       },
       {
         accessorKey: "crm",
@@ -100,6 +107,12 @@ const Example = () => {
             });
             setEditedUsers({ ...editedUsers, [row.id]: row.original });
           },
+          onFocus: (event) => {
+            event.currentTarget.style.backgroundColor =
+              theme.palette.mode === "dark" ? "rgba (3, 44, 43, 1)" : "#1e1e1e";
+            event.currentTarget.style.padding = "15px";
+            event.currentTarget.style.color = "#fff";
+          },
         }),
       },
       {
@@ -109,6 +122,7 @@ const Example = () => {
         editSelectOptions: service,
         size: 120,
         enableColumnActions: false,
+        enableSorting: false,
         muiEditTextFieldProps: ({ row }) => ({
           select: true,
           error: !!validationErrors?.state,
@@ -118,6 +132,12 @@ const Example = () => {
               ...editedUsers,
               [row.id]: { ...row.original, state: event.target.value },
             }),
+          onFocus: (event) => {
+            event.currentTarget.style.backgroundColor =
+              theme.palette.mode === "dark" ? "rgba (3, 44, 43, 1)" : "#1e1e1e";
+            event.currentTarget.style.padding = "15px";
+            event.currentTarget.style.color = "#fff";
+          },
         }),
       },
       {
@@ -142,6 +162,12 @@ const Example = () => {
             });
             setEditedUsers({ ...editedUsers, [row.id]: row.original });
           },
+          onFocus: (event) => {
+            event.currentTarget.style.backgroundColor =
+              theme.palette.mode === "dark" ? "rgba (3, 44, 43, 1)" : "#1e1e1e";
+            event.currentTarget.style.padding = "15px";
+            event.currentTarget.style.color = "#fff";
+          },
         }),
       },
       {
@@ -150,6 +176,7 @@ const Example = () => {
         editVariant: "select",
         editSelectOptions: usStates,
         size: 120,
+        enableSorting: false,
         enableColumnActions: false,
         muiEditTextFieldProps: ({ row }) => ({
           select: true,
@@ -160,6 +187,12 @@ const Example = () => {
               ...editedUsers,
               [row.id]: { ...row.original, state: event.target.value },
             }),
+          onFocus: (event) => {
+            event.currentTarget.style.backgroundColor =
+              theme.palette.mode === "dark" ? "rgba (3, 44, 43, 1)" : "#1e1e1e";
+            event.currentTarget.style.padding = "15px";
+            event.currentTarget.style.color = "#fff";
+          },
         }),
       },
       {
@@ -168,6 +201,7 @@ const Example = () => {
         editVariant: "select",
         size: 120,
         editSelectOptions: reason,
+        enableSorting: false,
         enableColumnActions: false,
         muiEditTextFieldProps: ({ row }) => ({
           select: true,
@@ -178,12 +212,19 @@ const Example = () => {
               ...editedUsers,
               [row.id]: { ...row.original, state: event.target.value },
             }),
+          onFocus: (event) => {
+            event.currentTarget.style.backgroundColor =
+              theme.palette.mode === "dark" ? "rgba (3, 44, 43, 1)" : "#1e1e1e";
+            event.currentTarget.style.padding = "15px";
+            event.currentTarget.style.color = "#fff";
+          },
         }),
       },
       {
         accessorKey: "subMotiv",
         header: "Sub Motivo",
         size: 120,
+        enableSorting: false,
         enableColumnActions: false,
         muiEditTextFieldProps: ({ cell, row }) => ({
           type: "text",
@@ -201,6 +242,14 @@ const Example = () => {
             });
             setEditedUsers({ ...editedUsers, [row.id]: row.original });
           },
+          onFocus: (event) => {
+            event.currentTarget.style.backgroundColor =
+              theme.palette.mode === "dark" ? "rgba (3, 44, 43, 1)" : "#1e1e1e";
+            //event.currentTarget.style.backgroundColor = "rgb(52, 52, 52)";
+            //event.currentTarget.style.borderRadiusTop = "40px";
+            event.currentTarget.style.padding = "15px";
+            event.currentTarget.style.color = "#fff";
+          },
         }),
       },
       {
@@ -208,6 +257,7 @@ const Example = () => {
         header: "Comision",
         enableEditing: false,
         size: 80,
+        enableSorting: false,
         enableColumnActions: false,
         muiEditTextFieldProps: ({ row }) => ({
           select: true,
@@ -274,11 +324,15 @@ const Example = () => {
     editDisplayMode: "cell", // ('modal', 'cell', 'table', and 'custom' también están disponibles)
     enableCellActions: true,
     enableClickToCopy: "context-menu",
-    enableColumnPinning: true,
+    enableColumnPinning: false, //Fijar la columna en los tres puntos (⁝)
     enableEditing: true,
     enableRowActions: true,
     enableFullScreenToggle: false, //Muestra un icono para pantalla completa
     enablePagination: false, //Muestra la paginacion
+    enableGlobalFilter: false, //Desabilita el filtro global (lupa de busqueda)
+    enableColumnFilters: false, //Desabilita el filtro en cada columna (lupa de busqueda en cada columna)
+    enableHiding: false, //Desabilita el boton donde muestra si ocultar o mostrar las columnas
+
     //enableColumnResizing: true, //Permite cambiar el tamano de la columna
     //enableTopToolbar: false, //Muestra la barra de herramientas Top-Bottom
     //enableColumnVirtualization: false,
@@ -287,12 +341,23 @@ const Example = () => {
     muiTableBodyCellProps: {
       sx: {
         color: "white",
-      }
+      },
+      align: "center",
+      /* onFocus: (event) => {
+        event.currentTarget.style.backgroundColor = "#e0dbdbb6";
+        event.currentTarget.style.borderRadiusTop = "5px";
+        event.currentTarget.style.border = "5px solid black";
+        event.currentTarget.style.padding = "5px";
+      },
+      onBlur: (event) => {
+        event.currentTarget.style.backgroundColor = 'transparent'
+      } */
     },
     muiTableHeadCellProps: {
-      sx:{
+      sx: {
         color: "white",
-      }
+      },
+      align: "center",
     },
     muiTableProps: {
       sx: {
@@ -350,7 +415,7 @@ const Example = () => {
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateUser,
     renderRowActions: ({ row }) => (
-      <Box sx={{ display: "flex", gap: "1rem"}}>
+      <Box sx={{ display: "flex", gap: "1rem" }}>
         <Tooltip title="Delete">
           <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
             <DeleteIcon />
@@ -386,11 +451,13 @@ const Example = () => {
             createRow(table, {
               //id: uuidv4().substring(0, 6),
               date: showDate(),
+              crm: "96723894678",
               service: "Porta Chip",
-              lastName: "Revoredo",
+              numero: 956734256,
               state: "Cancelado",
               reason: "Delivery",
               commission: "95732",
+              subMotiv: "No contesta",
             })
           );
         }}

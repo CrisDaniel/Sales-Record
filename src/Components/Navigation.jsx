@@ -129,13 +129,6 @@ function ResponsiveAppBar() {
               </Link>
             ))}
           </Box>
-          <Link href="/registros">
-            <Box>
-              <Button sx={{ color: "black", backgroundColor: "green" }}>
-                Point
-              </Button>
-            </Box>
-          </Link>
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
